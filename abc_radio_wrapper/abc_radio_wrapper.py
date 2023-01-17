@@ -20,11 +20,14 @@ class ABCRadio:
     def __init__(self):
         self.available_stations: List[
             str
-        ] = "jazz,dig,doublej,unearthed,country,triplej,classic".split(",")
+        ] = "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten".split(",")
 
     def search(self, **params) -> Optional["SearchResult"]:
         """ """
         query_string = ""
+        for param in params:
+            pass #add parameters to query string
+
         return None
 
 
@@ -73,7 +76,7 @@ class RadioSong:
         """
 
         song = Song.from_json(json_input)
-        return RadioSong(
+        return cls(
             played_time=datetime.fromisoformat(json_input["played_time"]),
             channel=json_input["service_id"],
             song=song,
@@ -93,7 +96,7 @@ class SearchResult:
         radio_songs = []
         for radio_song in json_input["elements"]:
             radio_songs.append(RadioSong.from_json(radio_song))
-        return SearchResult(
+        return cls(
             total=json_input["total"],
             offset=json_input["offset"],
             limit=json_input["limit"],
@@ -121,11 +124,12 @@ class Song:
             In the format of:
                 {"entity":"Play",
                  "arid":"...",
-                 "played_time":"2020-01-01T12:00:00+00:00"
-                 "service_id":"triplej"
-                 "recording":...,   # Song details (see Song class for more details)
-                 "release": ...     # Album details (see Album class for more details)
+                 "played_time":"2020-01-01T12:00:00+00:00",
+                 "service_id":"triplej",
+                 "recording":...,   # Song details 
+                 "release": ...     # Album details 
                  }
+
 
         Returns
         _______
@@ -137,7 +141,7 @@ class Song:
         for artist in json_input["release"]["artists"]:
             artists.append(Artist.from_json(artist))
         url = Song.get_url(json_input)
-        return Song(
+        return cls(
             title=json_input["recording"]["title"],
             duration=json_input["recording"]["duration"],
             artists=artists,
@@ -165,7 +169,7 @@ class Artist:
     def from_json(cls, json_input: dict[str, Any]) -> Artist:
         is_australian = bool(json_input["is_australian"])
         url = json_input["links"][0]["url"]
-        return Artist(url=url, name=json_input["name"], is_australian=is_australian)
+        return cls(url=url, name=json_input["name"], is_australian=is_australian)
 
 
 @dataclass
@@ -179,7 +183,7 @@ class Album:
     def from_json(cls, json_input: dict[str, Any]) -> Album:
         artwork = Artwork.from_json(json_input["artwork"][0])
 
-        return Album(
+        return cls(
             url=Album.get_url(json_input),
             title=json_input["title"],
             release_year=int(json_input["release_year"]),
@@ -218,7 +222,7 @@ class ArtworkSize:
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> ArtworkSize:
-        return ArtworkSize(
+        return cls(
             url=json_input["url"],
             width=json_input["width"],
             height=json_input["height"],
