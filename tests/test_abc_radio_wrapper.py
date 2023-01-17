@@ -32,7 +32,16 @@ class TestAbc_radio_wrapper(unittest.TestCase):
 
     def test_001_Song_object_creation(self):
         """Test something."""
-        self.assertEquals(self.json_search_result["total"], False)
+
+        album = abc_radio_wrapper.Album.from_json(self.json_search_result["items"][0]["release"])
+        artists = []
+        for artist in self.json_search_result["items"][0]["release"]["artists"]:
+            artists.append(abc_radio_wrapper.Artist.from_json(artist))
+
+        expected = abc_radio_wrapper.Song(title="Blue in Green",duration=277,url="http://musicbrainz.org/recording/11328517-1cce-4981-888b-f98cdeb0d7aa",artists=artists,album=album)
+
+        result= abc_radio_wrapper.Song.from_json(self.json_search_result["items"][0])
+        self.assertEquals(expected, result)
 
     def test_002_test_Artist_object_creation(self):
         """Test Artist instance can be created from json_input"""
@@ -52,7 +61,8 @@ class TestAbc_radio_wrapper(unittest.TestCase):
                 self.json_search_result["items"][0]["release"]
                 )
 
-        expected = None
+        artwork = abc_radio_wrapper.Artwork.from_json(self.json_search_result["items"][0]["release"]["artwork"][0])
+        expected = abc_radio_wrapper.Album(url=None,title="MD66", release_year=2016, artwork=artwork)
 
         self.assertEquals(expected, result)
 

@@ -12,8 +12,6 @@ EXAMPLE_SEARCH = "?from=2020-04-30T03:00:00.000Z&limit=10&offset=0&page=0&statio
 
 
 
-# Create a generic variable that can be 'Parent', or any subclass.
-T = TypeVar('T', bound='Parent')
 
 class ABCRadio:
     """API wrapper for accessing playlist history of various
@@ -81,19 +79,26 @@ class SearchResult:
 @dataclass
 class Song:
     title: str
-    format: str
+    duration: int
     artists: List["Artist"]
     album : "Album" 
-    url: str
+    url: Optional[str]
 
     @classmethod
     def from_json(cls, json_input: dict[str,Any]) -> Song:
-        album = Album.from_json(json_input["album"])
+        album = Album.from_json(json_input["release"])
         artists = []
-        for artist in json_input["artists"]:
+        for artist in json_input["release"]["artists"]:
             artists.append(Artist.from_json(artist))
+        url = Song.get_url(json_input)
+        return Song(title = json_input["recording"]["title"], duration= json_input["recording"]["duration"],artists=artists, album=album, url=url)
 
-        return Song(title = json_input["title"], format= json_input["format"],artists=artists, album=album, url=json_input["url"])
+    @staticmethod
+    def get_url(json_input):
+        if len(json_input["recording"]["links"]) >=1:
+            return json_input["recording"]["links"][0]['url']
+        else:
+            return None
 
 
 
@@ -115,15 +120,23 @@ class Artist:
 
 @dataclass
 class Album:
-    url: str
+    url: Optional[str]
     title: str
     artwork: "Artwork"
-    
+    release_year: int
+
     @classmethod
     def from_json(cls, json_input: dict[str,Any]) -> Album:
-        artwork = Artwork.from_json(json_input["artwork"])
-        return Album(url=json_input["url"], title=json_input["title"], artwork=artwork)
+        artwork = Artwork.from_json(json_input["artwork"][0])
 
+        return Album(url=Album.get_url(json_input), title=json_input["title"],release_year=int(json_input["release_year"]), artwork=artwork)
+
+    @staticmethod
+    def get_url(json_input):
+        if len(json_input["links"]) >=1:
+            return json_input["links"][0]['url']
+        else:
+            return None
 
 @dataclass
 class Artwork:
