@@ -51,7 +51,7 @@ class RadioSong:
 
     played_time: datetime
     channel: str
-    song: "Song"
+    song: Song
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> RadioSong:
@@ -74,7 +74,6 @@ class RadioSong:
         _______
         RadioSong
         """
-
         song = Song.from_json(json_input)
         return cls(
             played_time=datetime.fromisoformat(json_input["played_time"]),
@@ -94,7 +93,7 @@ class SearchResult:
     def from_json(cls, json_input: dict[str, Any]) -> SearchResult:
 
         radio_songs = []
-        for radio_song in json_input["elements"]:
+        for radio_song in json_input["items"]:
             radio_songs.append(RadioSong.from_json(radio_song))
         return cls(
             total=json_input["total"],
@@ -135,10 +134,11 @@ class Song:
         _______
         Song
         """
-
-        album = Album.from_json(json_input["release"])
+        
+        json_release = json_input["release"] if json_input["release"] else json_input["recording"]["releases"][0]
+        album = Album.from_json(json_release)
         artists = []
-        for artist in json_input["release"]["artists"]:
+        for artist in json_release["artists"]:
             artists.append(Artist.from_json(artist))
         url = Song.get_url(json_input)
         return cls(
@@ -176,8 +176,8 @@ class Artist:
 class Album:
     url: Optional[str]
     title: str
-    artwork: "Artwork"
-    release_year: int
+    artwork: Optional[Artwork]
+    release_year: Optional[int]
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> Album:
@@ -186,8 +186,8 @@ class Album:
         return cls(
             url=Album.get_url(json_input),
             title=json_input["title"],
-            release_year=int(json_input["release_year"]),
-            artwork=artwork,
+            release_year= int(json_input["release_year"]) if json_input["release_year"] else None,
+            artwork=artwork
         )
 
     @staticmethod

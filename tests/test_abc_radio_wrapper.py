@@ -121,10 +121,14 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         result = abc_radio_wrapper.RadioSong.from_json(self.json_search_result["items"][0])
         self.assertEquals(expected, result)
 
-    def test_007_test_Search(self):
-        """Test Search functionality can connect to abcradio web api and pull the necessary json object"""
-        expected = False
-        result = True
+    def test_007_test_SearchResult_object_creation(self):
+        """Test SearchResult object can be created from search json response"""
+       
+        radio_songs = []
+        for radio_song in self.json_search_result["items"]:
+            radio_songs.append(abc_radio_wrapper.RadioSong.from_json(radio_song))
+        expected = abc_radio_wrapper.SearchResult(total=142, offset=0,limit=10, radio_songs=radio_songs)
+        result = abc_radio_wrapper.SearchResult.from_json(self.json_search_result)
         self.assertEquals(expected, result)
 
     def test_008_test_Search_iterations(self):
