@@ -30,7 +30,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
 
     def test_000_test_file_loaded(self):
         """Test setUp file is loaded"""
-        self.assertEquals(self.json_search_result["total"], 142)
+        self.assertEqual(self.json_search_result["total"], 142)
 
     def test_001_Song_object_creation(self):
         """Test Song instance can be created from json_input"""
@@ -51,7 +51,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         )
 
         result = abc_radio_wrapper.Song.from_json(self.json_search_result["items"][0])
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_002_test_Artist_object_creation(self):
         """Test Artist instance can be created from json_input"""
@@ -63,7 +63,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             url="http://musicbrainz.org/artist/20638241-3b98-461a-9677-8cb039489326",
             is_australian=False,
         )
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_003_test_Album_object_creation(self):
         """Test Album instance can be created from json_input"""
@@ -78,7 +78,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             url=None, title="MD66", release_year=2016, artwork=artwork
         )
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_004_test_ArtworkSize_object_creation(self):
         """Test ArtworkSize instance can be created from json_input"""
@@ -91,7 +91,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             height=100,
             aspect_ratio="1x1",
         )
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_005_test_Artwork_object_creation(self):
         """Test Artwork instance can be created from json_input"""
@@ -109,7 +109,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             type="cover",
             sizes=sizes,
         )
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_006_test_RadioSong_object_creation(self):
         """Test RadioSong instance can be created from json_input"""
@@ -119,7 +119,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         song = abc_radio_wrapper.Song.from_json(self.json_search_result["items"][0])
         expected = abc_radio_wrapper.RadioSong(played_time=played_time, channel="jazz", song=song)
         result = abc_radio_wrapper.RadioSong.from_json(self.json_search_result["items"][0])
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_007_test_SearchResult_object_creation(self):
         """Test SearchResult object can be created from search json response"""
@@ -129,16 +129,57 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             radio_songs.append(abc_radio_wrapper.RadioSong.from_json(radio_song))
         expected = abc_radio_wrapper.SearchResult(total=142, offset=0,limit=10, radio_songs=radio_songs)
         result = abc_radio_wrapper.SearchResult.from_json(self.json_search_result)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
-    def test_008_test_Search_iterations(self):
-        """Test Search can be iterated by changing offset number"""
-        expected = False
-        result = True
-        self.assertEquals(expected, result)
 
-    def test_009_test_Search_parameters(self):
-        """Test Search parameters such as 'channel', 'startDate' affect search results"""
-        expected = False
-        result = True
-        self.assertEquals(expected, result)
+
+    def test_008_test_Search(self):
+        """Test Search with no parameters works when interacting
+        with the abc radio API endpoint
+        """
+
+        ABCWrapper = abc_radio_wrapper.ABCRadio()
+
+        result = ABCWrapper.search() 
+        self.assertEqual(result.offset, 0)
+        self.assertEqual(result.limit, 10)
+
+
+    def test_009_create_query_string(self):
+
+        expected: str = "?from=2020-04-30T03:00:00.000000Z&to=2020-04-30T03:16:00.000000Z&station=triplej&offset=0&limit=10"
+        
+        startDate: datetime = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
+        endDate: datetime = datetime.fromisoformat("2020-04-30T03:16:00+00:00")
+
+
+        result: str = abc_radio_wrapper.ABCRadio.construct_query_string(from_=startDate, to=endDate,station="triplej", offset=0,limit=10)
+
+        self.assertEqual(expected,result)
+
+    def test_010_test_Search_parameters(self):
+
+        """Test Search parameters such as 'channel', 'startDate' and that they affect search results"""
+        ABCRadio = abc_radio_wrapper.ABCRadio()
+        startDate = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
+        endDate = datetime.fromisoformat("2020-04-30T04:16:00+00:00")
+        result = ABCRadio.search(from_ =startDate, to = endDate)
+        expected = abc_radio_wrapper.SearchResult.from_json(self.json_search_result)
+
+        self.assertEqual(expected, result)
+
+
+    def test_011_test_Search_offset(self):
+        """test that offset is applied when added as parameter"""
+        ABCWrapper = abc_radio_wrapper.ABCRadio()
+
+        result = ABCWrapper.search(offset=10) 
+        self.assertEqual(result.offset, 10)
+        self.assertEqual(result.limit, 10)
+
+
+
+    def test_012_test_multiple_artists(self):
+        """ https://music.abcradio.net.au/api/v1/plays/search.json?from=2023-01-18T08:46:06.000Z """
+
+        self.assertEqual(True,False)

@@ -1,11 +1,10 @@
 """Main module."""
 from __future__ import annotations
-from datetime import datetime, timezone
-import json
-import os
+from datetime import datetime 
 from dataclasses import dataclass
-from typing import List, Type, Optional, Any, TypeVar
+from typing import List, Optional, Any, Iterator, TypedDict, Unpack, cast
 import requests
+
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 EXAMPLE_SEARCH = "?from=2020-04-30T03:00:00.000Z&limit=10&offset=0&page=0&station=triplej&to=2020-04-30T03:16:00.000Z"
@@ -17,18 +16,94 @@ class ABCRadio:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.available_stations: List[
             str
         ] = "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten".split(",")
+        self.BASE_URL: str = BASE_URL
+        self.latest_offset: int = 0 #keep track of state when iterating through a longer playlist of songs.
+        self.latest_search_parameters: Optional[RequestParams] = None
 
-    def search(self, **params) -> Optional["SearchResult"]:
-        """ """
-        query_string = ""
-        for param in params:
-            pass #add parameters to query string
+    def search(self, **params: Unpack[RequestParams]) -> "SearchResult":
+        """Send request to abc radio API endpoint and create SearchResult instance
 
-        return None
+        Parameters
+        ----------
+        **params: RequestParams
+            params["channel"]:str any of channels in self.available_stations 
+            params['startDate']: datetime
+        """
+
+        query_url = self.BASE_URL + self.construct_query_string(**params)
+        r = requests.get(query_url)
+        json_respose = r.json()
+        result = SearchResult.from_json(json_input=json_respose)
+        self.latest_offset = result.offset
+        self.latest_search_parameters = cast(RequestParams,params)
+        return result
+
+    @staticmethod
+    def construct_query_string(**params: Unpack[RequestParams]) -> str:
+        """
+        Construct query string to communicate with ABC radio API
+
+
+        Returns
+        _______
+        str
+            e.g. "from=2020-04-30T03:00:00.000000Z&to=2020-04-30T04:16:00.000000Z&station=triplej&offset=0&limit=10"
+            internally this will return the keys in the order 'from','to','station',''offset','limit'
+            although the ordering is not a requirement of the underlying web API
+        """
+        from_ = params.pop("from_",None)
+        to =  params.pop("to", None)
+        station = params.pop("station",None)
+        offset = params.pop("offset",None)
+        limit = params.pop("limit",None)
+        params_list = []
+        if from_ is not None:
+            params_list.append("from=" + from_.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        if to is not None:
+            params_list.append("to=" + to.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        if station is not None:
+            params_list.append("station=" + str(station))
+        if offset is not None:
+            params_list.append( "offset=" + str(offset))
+        if limit is not None:
+            params_list.append( "limit=" + str(limit))
+
+        if len(params_list)>=1:
+            return "?" + "&".join(params_list)
+        else:
+            return ""
+
+
+    def continuous_search(self, **params: Unpack[RequestParams]) -> Iterator[SearchResult]:
+        yield self.search(**params)
+        # make first search
+        # yield searchResult
+        # total = x
+        # offset = y
+        # limit = z
+        # while total > offset + limit:
+            # yield search result
+            # offset = search_result.offset
+            # limit 
+
+        
+
+
+class RequestParams(TypedDict, total=False):
+    """
+    **kwarg arguments to be used when searching in the ABC web api
+
+    """
+    from_ : datetime
+    to: datetime
+    limit: int
+    offset: int
+    station: str
+
 
 
 @dataclass
@@ -38,7 +113,7 @@ class RadioSong:
 
     Attributes
     ----------
-    played_time: datetime.datetime
+    played_time: datetime
         original playtime, including timezone information
 
     channel: str
@@ -109,7 +184,7 @@ class Song:
     title: str
     duration: int
     artists: List["Artist"]
-    album: "Album"
+    album: Optional[Album]
     url: Optional[str]
 
     @classmethod
@@ -134,12 +209,18 @@ class Song:
         _______
         Song
         """
-        
-        json_release = json_input["release"] if json_input["release"] else json_input["recording"]["releases"][0]
-        album = Album.from_json(json_release)
-        artists = []
-        for artist in json_release["artists"]:
-            artists.append(Artist.from_json(artist))
+        try: 
+            #Occassionally release information is not present or only exists
+            # under recordings.releases json key
+            json_release = json_input["release"] if json_input["release"] else json_input["recording"]["releases"][0]
+            album = Album.from_json(json_release)
+            artists = []
+            for artist in json_release["artists"]:
+                artists.append(Artist.from_json(artist))
+        except:
+            artists = []
+            album = None
+
         url = Song.get_url(json_input)
         return cls(
             title=json_input["recording"]["title"],
@@ -159,16 +240,19 @@ class Song:
 
 @dataclass
 class Artist:
-    """Dataclass"""
+    """Dataclass to represent Artists"""
 
-    url: str  # http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da\?inc\=aliases
+    url: Optional[str]  # http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da\?inc\=aliases
     name: str
     is_australian: bool
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> Artist:
         is_australian = bool(json_input["is_australian"])
-        url = json_input["links"][0]["url"]
+        if len(json_input["links"]) >= 1:
+            url = json_input["links"][0]["url"]
+        else:
+            url = None
         return cls(url=url, name=json_input["name"], is_australian=is_australian)
 
 
@@ -181,7 +265,10 @@ class Album:
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> Album:
-        artwork = Artwork.from_json(json_input["artwork"][0])
+        try:
+            artwork = Artwork.from_json(json_input["artwork"][0])
+        except IndexError:
+            artwork = None
 
         return cls(
             url=Album.get_url(json_input),
