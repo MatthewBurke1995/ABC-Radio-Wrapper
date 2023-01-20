@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/black venv
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/black venv typecheck
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -88,7 +88,11 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
+typecheck:
+	mypy --enable-incomplete-feature=Unpack abc_radio_wrapper/abc_radio_wrapper.py
 
-venv:
-	virtualenv env
-	source env/bin/activate
+venv: virtualenv
+	source virtualenv/bin/activate
+
+virtualenv:
+	python -m venv virtualenv
