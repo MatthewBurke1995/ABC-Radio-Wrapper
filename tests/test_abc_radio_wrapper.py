@@ -7,7 +7,7 @@ import unittest
 import os
 import json
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime
 
 from abc_radio_wrapper import abc_radio_wrapper
 
@@ -86,7 +86,9 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             self.json_search_result["items"][0]["release"]["artwork"][0]["sizes"][0]
         )
         expected = abc_radio_wrapper.ArtworkSize(
-            url="https://resize.abcradio.net.au/Mv2oBeipagYezPEjutlReBRUE2I=/100x100/center/middle/http%3A%2F%2Fabc-dn-mapi-production.s3.ap-southeast-2.amazonaws.com%2Frelease%2FmiBgqJJw9w%2Fecd96b225f7e933003fd2529df24d5bd.jpg",
+            url="https://resize.abcradio.net.au/Mv2oBeipagYezPEjutlReBRUE2I=/100x100/center/middle/"
+            "http%3A%2F%2Fabc-dn-mapi-production.s3.ap-southeast-2.amazonaws.com%2Frelease%2F"
+            "miBgqJJw9w%2Fecd96b225f7e933003fd2529df24d5bd.jpg",
             width=100,
             height=100,
             aspect_ratio="1x1",
@@ -105,7 +107,8 @@ class TestAbc_radio_wrapper(unittest.TestCase):
             sizes.append(abc_radio_wrapper.ArtworkSize.from_json(size))
 
         expected = abc_radio_wrapper.Artwork(
-            url="http://abc-dn-mapi-production.s3.ap-southeast-2.amazonaws.com/release/miBgqJJw9w/ecd96b225f7e933003fd2529df24d5bd.jpg",
+            url="http://abc-dn-mapi-production.s3.ap-southeast-2.amazonaws.com"
+            "/release/miBgqJJw9w/ecd96b225f7e933003fd2529df24d5bd.jpg",
             type="cover",
             sizes=sizes,
         )
@@ -114,7 +117,6 @@ class TestAbc_radio_wrapper(unittest.TestCase):
     def test_006_test_RadioSong_object_creation(self):
         """Test RadioSong instance can be created from json_input"""
         expected = False
-        # played_time =  datetime.strptime(self.json_search_result["items"][0]["played_time"], "%Y-%m-%dT%H:%M:%SZ")
         played_time = datetime.fromisoformat("2020-04-30T04:15:49+00:00")
         song = abc_radio_wrapper.Song.from_json(self.json_search_result["items"][0])
         expected = abc_radio_wrapper.RadioSong(
@@ -150,20 +152,25 @@ class TestAbc_radio_wrapper(unittest.TestCase):
 
     def test_009_create_query_string(self):
 
-        expected: str = "?from=2020-04-30T03:00:00.000000Z&to=2020-04-30T03:16:00.000000Z&station=triplej&offset=0&limit=10"
+        expected = (
+            "?from=2020-04-30T03:00:00.000000Z&"
+            "to=2020-04-30T03:16:00.000000Z&station=jazz&offset=0&limit=10"
+        )
 
         startDate: datetime = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
         endDate: datetime = datetime.fromisoformat("2020-04-30T03:16:00+00:00")
 
         result: str = abc_radio_wrapper.ABCRadio.construct_query_string(
-            from_=startDate, to=endDate, station="triplej", offset=0, limit=10
+            from_=startDate, to=endDate, station="jazz", offset=0, limit=10
         )
 
         self.assertEqual(expected, result)
 
     def test_010_test_Search_parameters(self):
-
-        """Test Search parameters such as 'channel', 'startDate' and that they affect search results"""
+        """
+        Test Search parameters such as 'station',
+        'from' and that they affect search results
+        """
         ABCRadio = abc_radio_wrapper.ABCRadio()
         startDate = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
         endDate = datetime.fromisoformat("2020-04-30T04:16:00+00:00")

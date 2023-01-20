@@ -7,7 +7,6 @@ import requests
 
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
-EXAMPLE_SEARCH = "?from=2020-04-30T03:00:00.000Z&limit=10&offset=0&page=0&station=triplej&to=2020-04-30T03:16:00.000Z"
 
 
 class ABCRadio:
@@ -53,8 +52,8 @@ class ABCRadio:
         Returns
         _______
         str
-            e.g. "from=2020-04-30T03:00:00.000000Z&to=2020-04-30T04:16:00.000000Z&station=triplej&offset=0&limit=10"
-            internally this will return the keys in the order 'from','to','station',''offset','limit'
+            e.g."?from=2020-04-30T03:00:00.000000Z&station=triplej&offset=0&limit=10"
+            internally this will return the keys order:'from','to','station',''offset','limit'
             although the ordering is not a requirement of the underlying web API
         """
         from_ = params.pop("from_", None)
@@ -118,7 +117,8 @@ class RadioSong:
         original playtime, including timezone information
 
     channel: str
-        Name of channel in which song was played e.g. "triplej","doublej","classic","jazz","unearthed","country"
+        Name of channel in which song was played
+        e.g. "triplej","doublej","classic","jazz","unearthed","country"
 
     song: Song
         contains metadata of the song including artist and album details
@@ -222,7 +222,7 @@ class Song:
             artists = []
             for artist in json_release["artists"]:
                 artists.append(Artist.from_json(artist))
-        except:
+        except (KeyError, IndexError):
             artists = []
             album = None
 
