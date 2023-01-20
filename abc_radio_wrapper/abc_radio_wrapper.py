@@ -1,6 +1,6 @@
 """Main module."""
 from __future__ import annotations
-from datetime import datetime 
+from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Any, Iterator, TypedDict, Unpack, cast
 import requests
@@ -21,7 +21,9 @@ class ABCRadio:
             str
         ] = "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten".split(",")
         self.BASE_URL: str = BASE_URL
-        self.latest_offset: int = 0 #keep track of state when iterating through a longer playlist of songs.
+        self.latest_offset: int = (
+            0  # keep track of state when iterating through a longer playlist of songs.
+        )
         self.latest_search_parameters: Optional[RequestParams] = None
 
     def search(self, **params: Unpack[RequestParams]) -> "SearchResult":
@@ -30,7 +32,7 @@ class ABCRadio:
         Parameters
         ----------
         **params: RequestParams
-            params["channel"]:str any of channels in self.available_stations 
+            params["channel"]:str any of channels in self.available_stations
             params['startDate']: datetime
         """
 
@@ -39,7 +41,7 @@ class ABCRadio:
         json_respose = r.json()
         result = SearchResult.from_json(json_input=json_respose)
         self.latest_offset = result.offset
-        self.latest_search_parameters = cast(RequestParams,params)
+        self.latest_search_parameters = cast(RequestParams, params)
         return result
 
     @staticmethod
@@ -55,11 +57,11 @@ class ABCRadio:
             internally this will return the keys in the order 'from','to','station',''offset','limit'
             although the ordering is not a requirement of the underlying web API
         """
-        from_ = params.pop("from_",None)
-        to =  params.pop("to", None)
-        station = params.pop("station",None)
-        offset = params.pop("offset",None)
-        limit = params.pop("limit",None)
+        from_ = params.pop("from_", None)
+        to = params.pop("to", None)
+        station = params.pop("station", None)
+        offset = params.pop("offset", None)
+        limit = params.pop("limit", None)
         params_list = []
         if from_ is not None:
             params_list.append("from=" + from_.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
@@ -68,17 +70,18 @@ class ABCRadio:
         if station is not None:
             params_list.append("station=" + str(station))
         if offset is not None:
-            params_list.append( "offset=" + str(offset))
+            params_list.append("offset=" + str(offset))
         if limit is not None:
-            params_list.append( "limit=" + str(limit))
+            params_list.append("limit=" + str(limit))
 
-        if len(params_list)>=1:
+        if len(params_list) >= 1:
             return "?" + "&".join(params_list)
         else:
             return ""
 
-
-    def continuous_search(self, **params: Unpack[RequestParams]) -> Iterator[SearchResult]:
+    def continuous_search(
+        self, **params: Unpack[RequestParams]
+    ) -> Iterator[SearchResult]:
         yield self.search(**params)
         # make first search
         # yield searchResult
@@ -86,11 +89,9 @@ class ABCRadio:
         # offset = y
         # limit = z
         # while total > offset + limit:
-            # yield search result
-            # offset = search_result.offset
-            # limit 
-
-        
+        # yield search result
+        # offset = search_result.offset
+        # limit
 
 
 class RequestParams(TypedDict, total=False):
@@ -98,12 +99,12 @@ class RequestParams(TypedDict, total=False):
     **kwarg arguments to be used when searching in the ABC web api
 
     """
-    from_ : datetime
+
+    from_: datetime
     to: datetime
     limit: int
     offset: int
     station: str
-
 
 
 @dataclass
@@ -180,7 +181,7 @@ class SearchResult:
 
 @dataclass
 class Song:
-    
+
     title: str
     duration: int
     artists: List["Artist"]
@@ -200,8 +201,8 @@ class Song:
                  "arid":"...",
                  "played_time":"2020-01-01T12:00:00+00:00",
                  "service_id":"triplej",
-                 "recording":...,   # Song details 
-                 "release": ...     # Album details 
+                 "recording":...,   # Song details
+                 "release": ...     # Album details
                  }
 
 
@@ -209,10 +210,14 @@ class Song:
         _______
         Song
         """
-        try: 
-            #Occassionally release information is not present or only exists
+        try:
+            # Occassionally release information is not present or only exists
             # under recordings.releases json key
-            json_release = json_input["release"] if json_input["release"] else json_input["recording"]["releases"][0]
+            json_release = (
+                json_input["release"]
+                if json_input["release"]
+                else json_input["recording"]["releases"][0]
+            )
             album = Album.from_json(json_release)
             artists = []
             for artist in json_release["artists"]:
@@ -242,7 +247,9 @@ class Song:
 class Artist:
     """Dataclass to represent Artists"""
 
-    url: Optional[str]  # http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da\?inc\=aliases
+    url: Optional[
+        str
+    ]  # http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da\?inc\=aliases
     name: str
     is_australian: bool
 
@@ -273,8 +280,10 @@ class Album:
         return cls(
             url=Album.get_url(json_input),
             title=json_input["title"],
-            release_year= int(json_input["release_year"]) if json_input["release_year"] else None,
-            artwork=artwork
+            release_year=int(json_input["release_year"])
+            if json_input["release_year"]
+            else None,
+            artwork=artwork,
         )
 
     @staticmethod

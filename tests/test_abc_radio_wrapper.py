@@ -114,24 +114,28 @@ class TestAbc_radio_wrapper(unittest.TestCase):
     def test_006_test_RadioSong_object_creation(self):
         """Test RadioSong instance can be created from json_input"""
         expected = False
-        #played_time =  datetime.strptime(self.json_search_result["items"][0]["played_time"], "%Y-%m-%dT%H:%M:%SZ")
-        played_time =  datetime.fromisoformat("2020-04-30T04:15:49+00:00")
+        # played_time =  datetime.strptime(self.json_search_result["items"][0]["played_time"], "%Y-%m-%dT%H:%M:%SZ")
+        played_time = datetime.fromisoformat("2020-04-30T04:15:49+00:00")
         song = abc_radio_wrapper.Song.from_json(self.json_search_result["items"][0])
-        expected = abc_radio_wrapper.RadioSong(played_time=played_time, channel="jazz", song=song)
-        result = abc_radio_wrapper.RadioSong.from_json(self.json_search_result["items"][0])
+        expected = abc_radio_wrapper.RadioSong(
+            played_time=played_time, channel="jazz", song=song
+        )
+        result = abc_radio_wrapper.RadioSong.from_json(
+            self.json_search_result["items"][0]
+        )
         self.assertEqual(expected, result)
 
     def test_007_test_SearchResult_object_creation(self):
         """Test SearchResult object can be created from search json response"""
-       
+
         radio_songs = []
         for radio_song in self.json_search_result["items"]:
             radio_songs.append(abc_radio_wrapper.RadioSong.from_json(radio_song))
-        expected = abc_radio_wrapper.SearchResult(total=142, offset=0,limit=10, radio_songs=radio_songs)
+        expected = abc_radio_wrapper.SearchResult(
+            total=142, offset=0, limit=10, radio_songs=radio_songs
+        )
         result = abc_radio_wrapper.SearchResult.from_json(self.json_search_result)
         self.assertEqual(expected, result)
-
-
 
     def test_008_test_Search(self):
         """Test Search with no parameters works when interacting
@@ -140,22 +144,22 @@ class TestAbc_radio_wrapper(unittest.TestCase):
 
         ABCWrapper = abc_radio_wrapper.ABCRadio()
 
-        result = ABCWrapper.search() 
+        result = ABCWrapper.search()
         self.assertEqual(result.offset, 0)
         self.assertEqual(result.limit, 10)
-
 
     def test_009_create_query_string(self):
 
         expected: str = "?from=2020-04-30T03:00:00.000000Z&to=2020-04-30T03:16:00.000000Z&station=triplej&offset=0&limit=10"
-        
+
         startDate: datetime = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
         endDate: datetime = datetime.fromisoformat("2020-04-30T03:16:00+00:00")
 
+        result: str = abc_radio_wrapper.ABCRadio.construct_query_string(
+            from_=startDate, to=endDate, station="triplej", offset=0, limit=10
+        )
 
-        result: str = abc_radio_wrapper.ABCRadio.construct_query_string(from_=startDate, to=endDate,station="triplej", offset=0,limit=10)
-
-        self.assertEqual(expected,result)
+        self.assertEqual(expected, result)
 
     def test_010_test_Search_parameters(self):
 
@@ -163,23 +167,15 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         ABCRadio = abc_radio_wrapper.ABCRadio()
         startDate = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
         endDate = datetime.fromisoformat("2020-04-30T04:16:00+00:00")
-        result = ABCRadio.search(from_ =startDate, to = endDate)
+        result = ABCRadio.search(from_=startDate, to=endDate)
         expected = abc_radio_wrapper.SearchResult.from_json(self.json_search_result)
 
         self.assertEqual(expected, result)
-
 
     def test_011_test_Search_offset(self):
         """test that offset is applied when added as parameter"""
         ABCWrapper = abc_radio_wrapper.ABCRadio()
 
-        result = ABCWrapper.search(offset=10) 
+        result = ABCWrapper.search(offset=10)
         self.assertEqual(result.offset, 10)
         self.assertEqual(result.limit, 10)
-
-
-
-    def test_012_test_multiple_artists(self):
-        """ https://music.abcradio.net.au/api/v1/plays/search.json?from=2023-01-18T08:46:06.000Z """
-
-        self.assertEqual(True,False)
