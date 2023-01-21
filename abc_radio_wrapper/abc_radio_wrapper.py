@@ -1,10 +1,11 @@
 """Main module."""
 from __future__ import annotations
-from datetime import datetime
-from dataclasses import dataclass
-from typing import List, Optional, Any, Iterator, TypedDict, Unpack, cast
-import requests
 
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Iterator, List, Optional, TypedDict, Unpack, cast
+
+import requests
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 
