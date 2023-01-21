@@ -26,7 +26,6 @@ API wrapper library for the song history of abc radio channels
 Features
 --------
 
-* TODO
 
 Credits
 -------
