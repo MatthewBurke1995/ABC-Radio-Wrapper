@@ -38,7 +38,7 @@ setup(
     packages=find_packages(include=['abc_radio_wrapper', 'abc_radio_wrapper.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/matthewburke1995/abc_radio_wrapper',
+    url='https://github.com/MatthewBurke1995/ABC-Radio-Wrapper',
     version='0.1.0',
     zip_safe=False,
 )
