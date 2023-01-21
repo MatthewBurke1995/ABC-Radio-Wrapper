@@ -23,8 +23,27 @@ API wrapper library for the song history of abc radio channels
 * Documentation: https://abc-radio-wrapper.readthedocs.io.
 
 
+Quick Start
+-----------
+
+.. code-block:: python
+
+    import abc_radio_wrapper
+
+    ABC = abc_radio_wrapper.ABCRadio()
+
+    search_result = ABC.search(station="triplej")
+
+    for radio_play in search_result.radio_songs:
+        print(radio_play.song.title)
+        for artist in radio_play.song.artists:
+            print(artist.name)
+
+
 Features
 --------
+
+
 
 
 Credits
