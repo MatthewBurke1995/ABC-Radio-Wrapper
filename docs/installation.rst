@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/matthewburke1995/abc_radio_wrapper
+    $ git clone git://github.com/MatthewBurke1995/ABC_Radio_Wrapper
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/matthewburke1995/abc_radio_wrapper/tarball/master
+    $ curl -OJL https://github.com/MatthewBurke1995/ABC_Radio_Wrapper/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/matthewburke1995/abc_radio_wrapper
-.. _tarball: https://github.com/matthewburke1995/abc_radio_wrapper/tarball/master
+.. _Github repo: https://github.com/MatthewBurke1995/ABC_Radio_Wrapper
+.. _tarball: https://github.com/MatthewBurke1995/ABC_Radio_Wrapper/tarball/master
