@@ -9,6 +9,7 @@ import requests
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 
+
 class ABCRadio:
     """API wrapper for accessing playlist history of various
     Australian Broadcasting Corporation radio channels
@@ -78,37 +79,42 @@ class ABCRadio:
         else:
             return ""
 
-
-    
     def continuous_search(
         self, **params: Unpack[RequestParams]
     ) -> Iterator[SearchResult]:
 
         initial_search = self.search(**params)
         yield initial_search
-        total= initial_search.total
+        total = initial_search.total
         offset = initial_search.offset
         limit = initial_search.limit
-        while offset+limit < total:
-            offset = offset+limit
+        while offset + limit < total:
+            offset = offset + limit
             params["offset"] = offset
             yield self.search(**params)
-
-
-        # make first search
-        # yield searchResult
-        # total = x
-        # offset = y
-        # limit = z
-        # while total > offset + limit:
-        # yield search result
-        # offset = search_result.offset
-        # limit
 
 
 class RequestParams(TypedDict, total=False):
     """
     **kwarg arguments to be used when searching in the ABC web api
+
+    Parameters
+    ----------
+    from_: datetime
+        The earliest data starts from "2014-04-30T03:00:04+00:00"
+
+    to: datetime
+        to value should be greater than from_
+
+    limit: int
+        number of results to display in a single request, effective limit is 100
+
+    offset: int
+        index at which to start returning results, you can iterate through all
+        radio plays by updating this value. See continuous_search for an example
+        implementation.
+    station: str
+       any one of: "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten"
 
     """
 
@@ -121,7 +127,9 @@ class RequestParams(TypedDict, total=False):
 
 @dataclass
 class RadioSong:
-    """Dataclass for each entity returned from ABCradio.search
+    """
+    Dataclass for each entity returned from ABCradio.search,
+    A RadioSong is a Song played at a specific time on a specific channel.
 
 
     Attributes
@@ -173,6 +181,10 @@ class RadioSong:
 
 @dataclass
 class SearchResult:
+    """
+    Dataclass returned from ABCRadio.search
+    """
+
     total: int
     offset: int
     limit: int
@@ -194,6 +206,10 @@ class SearchResult:
 
 @dataclass
 class Song:
+    """
+    Dataclass to represent a song
+
+    """
 
     title: str
     duration: int
