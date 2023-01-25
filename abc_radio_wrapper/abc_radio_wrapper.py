@@ -11,7 +11,8 @@ BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 
 
 class ABCRadio:
-    """API wrapper for accessing playlist history of various
+    """
+    API wrapper for accessing playlist history of various
     Australian Broadcasting Corporation radio channels
 
     """
@@ -115,7 +116,6 @@ class RequestParams(TypedDict, total=False):
         implementation.
     station: str
        any one of: "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten"
-
     """
 
     from_: datetime
