@@ -44,6 +44,12 @@ Features
 --------
 
 
+TODO:
+----
+
+- Pull out dataclasses into seperate class files
+- Pull out unittests into seperate files
+- Add async queries (could be difficult since the underlying web API is undocumented and we don't know what the rate limit is)
 
 
 Credits
