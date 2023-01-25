@@ -2,6 +2,6 @@
 
 __author__ = """Matthew Burke"""
 __email__ = 'mperoburke@gmail.com'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 from .abc_radio_wrapper import *  # noqa
