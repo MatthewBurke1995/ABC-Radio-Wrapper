@@ -16,15 +16,11 @@ requirements = [
 
 test_requirements = [
         "mypy>=0.991",
-        "mypy-extensions>=0.4.3",
         "types-requests>=2.28.11.8",
-        "types-urllib3>=1.26.25.4",
         "typing_extensions>=4.4.0",
         "requests>=2.27.1",
         "black>=22.12.0",
-        "flake8>==6.0.0",
-        "Sphinx>=5.3.0",
-        "sphinx-rtd-theme>=1.1.1"
+        "flake8>==6.0.0"
 ]
 
 setup(
