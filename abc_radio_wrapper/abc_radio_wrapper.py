@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Iterator, List, Optional, TypedDict, Unpack, cast
+from typing_extensions import Unpack
+from typing import Any, Iterator, List, Optional, TypedDict, cast
 
 import requests
 
