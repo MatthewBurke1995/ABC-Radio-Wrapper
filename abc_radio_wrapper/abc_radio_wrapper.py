@@ -9,7 +9,6 @@ import requests
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 
-
 class ABCRadio:
     """API wrapper for accessing playlist history of various
     Australian Broadcasting Corporation radio channels
@@ -79,10 +78,23 @@ class ABCRadio:
         else:
             return ""
 
+
+    
     def continuous_search(
         self, **params: Unpack[RequestParams]
     ) -> Iterator[SearchResult]:
-        yield self.search(**params)
+
+        initial_search = self.search(**params)
+        yield initial_search
+        total= initial_search.total
+        offset = initial_search.offset
+        limit = initial_search.limit
+        while offset+limit < total:
+            offset = offset+limit
+            params["offset"] = offset
+            yield self.search(**params)
+
+
         # make first search
         # yield searchResult
         # total = x
@@ -223,7 +235,7 @@ class Song:
             artists = []
             for artist in json_release["artists"]:
                 artists.append(Artist.from_json(artist))
-        except (KeyError, IndexError):
+        except (KeyError, IndexError, TypeError):
             artists = []
             album = None
 
