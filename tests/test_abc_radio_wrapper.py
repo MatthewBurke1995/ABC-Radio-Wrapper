@@ -193,20 +193,19 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         while updating the offset parameter.
         """
         ABCWrapper = abc_radio_wrapper.ABCRadio()
-        
-
 
         startDate: datetime = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
         endDate: datetime = datetime.fromisoformat("2020-04-30T03:15:00+00:00")
 
-        i=0
+        i = 0
         offsets = []
-        for searchresult in ABCWrapper.continuous_search(from_=startDate, to=endDate,limit=10):
-            i+=1
+        for searchresult in ABCWrapper.continuous_search(
+            from_=startDate, to=endDate, limit=10
+        ):
+            i += 1
             offsets.append(searchresult.offset)
             total = searchresult.total
 
-        self.assertTrue(i>2)
-        self.assertEqual([0,10,20,30],offsets)
-        self.assertEqual(31,total)
-
+        self.assertTrue(i > 2)
+        self.assertEqual([0, 10, 20, 30], offsets)
+        self.assertEqual(31, total)
