@@ -43,6 +43,10 @@ Quick Start
 Features
 --------
 
+- Use python to search through the radio catalogue of triplej, ABC jazz, doublej and more!
+- full type coverage for fast type hints on modern IDE's
+- >90% test coverage
+
 
 TODO:
 ----
