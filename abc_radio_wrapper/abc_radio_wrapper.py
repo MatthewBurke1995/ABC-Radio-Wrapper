@@ -1,3 +1,10 @@
+"""
+Main and only module used to search through the abcradio API.
+
+ABCRadio class is used to conduct the search. The other classes
+are used to provide structured data and functionality to the result 
+
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,13 +25,14 @@ class ABCRadio:
     """
 
     def __init__(self) -> None:
+        """
+        Initialize the ABCRadio class for searching
+        """
+
         self.available_stations: List[
             str
         ] = "jazz,dig,doublej,unearthed,country,triplej,classic,kidslisten".split(",")
         self.BASE_URL: str = BASE_URL
-        self.latest_offset: int = (
-            0  # keep track of state when iterating through a longer playlist of songs.
-        )
         self.latest_search_parameters: Optional[RequestParams] = None
 
     def search(self, **params: Unpack[RequestParams]) -> "SearchResult":
@@ -83,6 +91,22 @@ class ABCRadio:
     def continuous_search(
         self, **params: Unpack[RequestParams]
     ) -> Iterator[SearchResult]:
+        """
+        generate next set of search results each time the function is called.
+
+        Examples
+        --------
+        for searchresult in ABC.continuous_search():
+                #see SearchResult documentation for usage from here.
+
+        Warnings
+        --------
+        if parameters are not added to the continuous_search and the
+        program flow is not controlled then allowing the generator to
+        continuously generate results will lead to roughly a million
+        requests to the underling API (~720,000 as of Jan 2023)
+
+        """
 
         initial_search = self.search(**params)
         yield initial_search
@@ -192,6 +216,10 @@ class SearchResult:
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> SearchResult:
+        """
+        Create hierarchy of objects using the result of a single request.
+        To see the expected json_format: https://music.abcradio.net.au/api/v1/plays/search.json
+        """
 
         radio_songs = []
         for radio_song in json_input["items"]:
@@ -266,6 +294,11 @@ class Song:
 
     @staticmethod
     def get_url(json_input):
+        """
+        Occassionally the url to musicbrainz will be missing,
+        make the proper check and return the url if it exists
+        otherwise return null
+        """
         if len(json_input["recording"]["links"]) >= 1:
             return json_input["recording"]["links"][0]["url"]
         else:
@@ -274,16 +307,35 @@ class Song:
 
 @dataclass
 class Artist:
-    """Dataclass to represent Artists"""
+    """
+    Dataclass to represent Artists
+
+
+    Attributes
+    ----------
+    url: Optional[str]
+        url that points to musicbrainz info page for the artist
+
+    name: str
+        Name of the artist e.g. "Justin Bieber"
+
+    is_australian: Optional[bool]
+        Almost always will be null, the underlying REST api rarely provides a value
+    """
 
     url: Optional[
         str
     ]  # http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da\?inc\=aliases
     name: str
-    is_australian: bool
+    is_australian: Optional[bool]
 
     @classmethod
     def from_json(cls, json_input: dict[str, Any]) -> Artist:
+        """
+        Construct the Artist object from the json representation in
+        https://music.abcradio.net.au/api/v1/plays/search.json
+
+        """
         is_australian = bool(json_input["is_australian"])
         if len(json_input["links"]) >= 1:
             url = json_input["links"][0]["url"]
@@ -294,6 +346,12 @@ class Artist:
 
 @dataclass
 class Album:
+    """
+    Dataclass to represent an album (referred to as "releases" in underlying web API).
+    A song can be featured on several albums.
+
+
+    """
     url: Optional[str]
     title: str
     artwork: Optional[Artwork]
@@ -325,6 +383,12 @@ class Album:
 
 @dataclass
 class Artwork:
+    """
+    Dataclass to represent the artwork of an associated Album.
+    Each album can have several artworks and each artwork can have several
+    image formats/sizes. 
+
+    """
     url: str
     type: str
     sizes: List[ArtworkSize]
@@ -340,6 +404,12 @@ class Artwork:
 
 @dataclass
 class ArtworkSize:
+    """
+    Dataclass to represent the image format/size for each artwork.
+    Most typical use case is providing large images or thumbnails for
+    each different interface.
+    """
+
     url: str
     width: int
     height: int

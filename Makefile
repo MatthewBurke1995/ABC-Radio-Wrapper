@@ -67,6 +67,7 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
+	interrogate --generate-badge docs/coverage.svg
 	rm -f docs/abc_radio_wrapper.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ abc_radio_wrapper

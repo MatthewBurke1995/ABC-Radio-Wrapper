@@ -13,6 +13,7 @@ ABC Radio Wrapper
         :target: https://abc-radio-wrapper.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
+.. image:: https://raw.githubusercontent.com/MatthewBurke1995/ABC-Radio-Wrapper/main/docs/coverage.svg
 
 
 
