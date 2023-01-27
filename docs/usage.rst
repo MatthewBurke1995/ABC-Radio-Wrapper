@@ -19,7 +19,6 @@ To iterate through all songs of a radio channel between two time periods::
 
     ABC = abc_radio_wrapper.ABCRadio()
 
-
     startDate: datetime = datetime.fromisoformat("2020-04-30T03:00:00+00:00")
     endDate: datetime = datetime.fromisoformat("2020-05-01T03:00:00+00:00")
 
@@ -31,3 +30,5 @@ To iterate through all songs of a radio channel between two time periods::
                 print(artist.name)
 
 
+
+A blog post with similar usage can be found [here](https://matthewburke.xyz/ABC%20Radio/)
