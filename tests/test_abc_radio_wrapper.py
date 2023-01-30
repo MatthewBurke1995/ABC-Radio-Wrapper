@@ -3,11 +3,11 @@
 """Tests for `abc_radio_wrapper` package."""
 
 
-import unittest
-import os
 import json
-from typing import List
+import os
+import unittest
 from datetime import datetime
+from typing import List
 
 from abc_radio_wrapper import abc_radio_wrapper
 
