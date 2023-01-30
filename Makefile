@@ -50,9 +50,11 @@ clean-test: ## remove test and coverage artifacts
 lint/flake8: ## check style with flake8
 	flake8 abc_radio_wrapper tests
 lint/black: ## check style with black
-	black --check abc_radio_wrapper tests
+	black abc_radio_wrapper tests
+lint/isort:
+	isort .
 
-lint: lint/flake8 lint/black ## check style
+lint: typecheck lint/flake8 lint/isort lint/black ## check style
 
 test: ## run tests quickly with the default Python
 	python3 setup.py test
@@ -92,8 +94,3 @@ install: clean ## install the package to the active Python's site-packages
 typecheck:
 	mypy --enable-incomplete-feature=Unpack abc_radio_wrapper/abc_radio_wrapper.py
 
-venv: virtualenv
-	source virtualenv/bin/activate
-
-virtualenv:
-	python -m venv virtualenv
