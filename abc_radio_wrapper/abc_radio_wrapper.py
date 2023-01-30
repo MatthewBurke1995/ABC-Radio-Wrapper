@@ -2,17 +2,17 @@
 Main and only module used to search through the abcradio API.
 
 ABCRadio class is used to conduct the search. The other classes
-are used to provide structured data and functionality to the result 
+are used to provide structured data and functionality to the result
 
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing_extensions import Unpack
 from typing import Any, Iterator, List, Optional, TypedDict, cast
 
 import requests
+from typing_extensions import Unpack
 
 BASE_URL = "https://music.abcradio.net.au/api/v1/plays/search.json"
 
@@ -352,6 +352,7 @@ class Album:
 
 
     """
+
     url: Optional[str]
     title: str
     artwork: Optional[Artwork]
@@ -386,9 +387,10 @@ class Artwork:
     """
     Dataclass to represent the artwork of an associated Album.
     Each album can have several artworks and each artwork can have several
-    image formats/sizes. 
+    image formats/sizes.
 
     """
+
     url: str
     type: str
     sizes: List[ArtworkSize]
