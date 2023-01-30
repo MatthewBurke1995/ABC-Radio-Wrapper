@@ -58,6 +58,6 @@ setup(
     tests_require=test_requirements,
     extras_require=extras,
     url='https://github.com/MatthewBurke1995/ABC-Radio-Wrapper',
-    version='0.2.1',
+    version='0.3.0',
     zip_safe=False,
 )
