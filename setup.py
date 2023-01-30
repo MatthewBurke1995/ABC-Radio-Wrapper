@@ -2,7 +2,7 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -20,8 +20,17 @@ test_requirements = [
         "typing_extensions>=4.4.0",
         "requests>=2.27.1",
         "black>=22.12.0",
-        "flake8>==6.0.0"
+        "flake8>==6.0.0",
+        "sphinx",
+        "sphinx_rtd_theme",
+        "interrogate",
+        "coverage",
+        "isort"
 ]
+
+extras = {
+    "test": test_requirements,
+}
 
 setup(
     author="Matthew Burke",
@@ -37,7 +46,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="API wrapper library for the song history of abc radio channels",
+    description="API wrapper library for the song history of ABC radio channels",
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
@@ -47,6 +56,7 @@ setup(
     packages=find_packages(include=['abc_radio_wrapper', 'abc_radio_wrapper.*']),
     test_suite='tests',
     tests_require=test_requirements,
+    extras_require=extras,
     url='https://github.com/MatthewBurke1995/ABC-Radio-Wrapper',
     version='0.2.1',
     zip_safe=False,
