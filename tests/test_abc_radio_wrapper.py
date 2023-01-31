@@ -61,7 +61,7 @@ class TestAbc_radio_wrapper(unittest.TestCase):
         expected = abc_radio_wrapper.Artist(
             name="Jim Snidero",
             url="http://musicbrainz.org/artist/20638241-3b98-461a-9677-8cb039489326",
-            is_australian=False,
+            is_australian=None,
         )
         self.assertEqual(expected, result)
 
