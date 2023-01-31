@@ -336,7 +336,10 @@ class Artist:
         https://music.abcradio.net.au/api/v1/plays/search.json
 
         """
-        is_australian = bool(json_input["is_australian"])
+        if json_input["is_australian"] is None:
+            is_australian = None
+        else:
+            is_australian = bool(json_input["is_australian"])
         if len(json_input["links"]) >= 1:
             url = json_input["links"][0]["url"]
         else:

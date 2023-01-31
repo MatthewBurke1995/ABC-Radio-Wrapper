@@ -30,5 +30,3 @@ To iterate through all songs of a radio channel between two time periods::
                 print(artist.name)
 
 
-
-A blog post with similar usage can be found [here](https://matthewburke.xyz/ABC%20Radio/)
